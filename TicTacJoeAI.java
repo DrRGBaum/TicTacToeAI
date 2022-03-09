@@ -18,7 +18,7 @@ public class TicTacJoeAI {
   int x, y, z;
   int random;
 
-  boolean playerswitch;
+  boolean playerswitch, corner, frame;
   char figure1 = 'X';
   char figure2 = 'O';
 
@@ -28,7 +28,10 @@ public class TicTacJoeAI {
 
     pickAI = free.get(rand.nextInt(free.size()));
 
-    if (player1.contains(5) || player2.contains(5)) {// random eckfeld um gegner zu blocken oder falle zu stellen
+    corner = frame = false;
+    // setzt in die ecken wenn gegner ränder zuerst setzt
+    if (player1.contains(2) || player1.contains(4) || player1.contains(6) || player1.contains(8)) {
+      frame = true;
       pickList.clear();
       x = 1;
       y = 7;
@@ -46,6 +49,7 @@ public class TicTacJoeAI {
 
     // setzt in in die ränder wenn gegner zuerst in die ecken setzt
     if (player1.contains(1) || player1.contains(3) || player1.contains(7) || free.contains(9)) {
+      corner = true;
       pickList.clear();
       for (int i = 2; i < 9; i = i + 2) { // wählt random ein freies randfeld aus
         if (free.contains(i)) {
@@ -57,8 +61,50 @@ public class TicTacJoeAI {
       }
     }
 
-    // setzt in die ecken wenn gegner ränder zuerst setzt
-    if (player1.contains(2) || player1.contains(4) || player1.contains(6) || player1.contains(8)) {
+    // soll wenn 1 ecke und 1 rand ist die ecke dazwischen blockieren
+    if (corner && frame && player1.size() == 2) {
+
+      if (player1.size() >= 1) {// sucht nach angrenzenden feldern vom gegner und seztzt auf eine ecke dieser
+                                // felder
+        for (int i = 0; i < player1.size(); i++) {
+          if (free.contains(player1.get(i) + 1)) {
+            if (player1.get(i) + 1 != 4 || player1.get(i) + 1 != 7) { // rechts
+              pickList.add(player1.get(i) + 1);
+            } // ------------------------------------
+          }
+          if (free.contains(player1.get(i) - 1)) {
+            if (player1.get(i) - 1 != 3 || player1.get(i) - 1 != 6) { // links
+              pickList.add(player1.get(i) - 1);
+            }
+            // ------------------------------------
+          }
+          if (free.contains(player1.get(i) + 3)) { // unten
+            pickList.add(player1.get(i) + 3);
+            // ------------------------------------
+          }
+          if (free.contains(player1.get(i) - 3)) { // oben
+            pickList.add(player1.get(i) - 3);
+            // ------------------------------------
+          }
+        }
+        x = 1;
+        y = 7;
+        for (; y < 10; y = y + 2, x = x + 2) {
+          if (pickList.contains(x)) {
+            pickAI = x;
+            break;
+          } else if (pickList.contains(y)) {
+            pickAI = y;
+            break;
+          }
+        }
+      }
+
+      // eckfeld das einem gegnerischen feld anliegt
+    }
+
+    // random eckfeld um gegner zu blocken oder falle zu stellen
+    if (player1.contains(5) || player2.contains(5)) {
       pickList.clear();
       x = 1;
       y = 7;
